@@ -1,52 +1,16 @@
 from typehints import *
+import database
+import insert as i  # Assumes insert.py has insert_faculty, insert_faculty_info, etc.
 
-def create_relations(db_connector: Connection, cursor: Cursor) -> None:
-	r"""
-	Creates relational constraints for the database by defining additional relations.
-
-	This function establishes foreign keys, uniqueness constraints, and checks on 
-	relational tables that depend on the previously created schema.
-
-	Parameters
-	==========
-	- **db_connector** : Connection
-	  The database connection object used to interact with the database.
-
-	- **cursor** : Cursor
-	  A cursor object for executing SQL commands.
-
-	Tables Created
-	==============
-	- **``faculty_info``**: Stores faculty phone, salary, and password.
-	- **``section_class``**: Links sections to classrooms (non-labs).
-	- **``section_students``**: Maps students to their sections.
-	- **``faculty_section_course``**: Assigns faculties to teach courses in sections.
-	- **``student_electives``**: Keeps track of students' elective course selections.
-
-	Examples
-	========
-	.. code-block:: python
-
-		>>> from SASTRA import *
-
-		>>> # Create Connection object and Cursor object
-		>>> connector, cursor = connect(
-				user="root",
-				password="secret_pwd",
-				host="localhost"
-			)
-		
-		>>> create_database(connector, cursor)
-		>>> create_relations(connector, cursor)
-
-	See Also
-	========
-	- `create_database()`: Defines base tables before relations are added.
+def create_relations_and_insert_sample_data(db_connector: Connection, cursor: Cursor) -> None:
 	"""
-	import database
+	Creates relational constraints and inserts sample data to test faculty-course-section mappings.
+	"""
+	# Step 1: Create base tables
 	database.create_database(db_connector, cursor)
 
-	# Table: faculty_info
+	# Step 2: Create relational tables
+
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `faculty_info` (
 		`faculty_id` MEDIUMINT UNSIGNED,
 		`phone` CHAR(10) NOT NULL,
@@ -58,7 +22,6 @@ def create_relations(db_connector: Connection, cursor: Cursor) -> None:
 		CHECK(`phone` REGEXP '^[6789][0-9]{9}$')
 	)""")
 
-	# Table: section_class
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `section_class` (
 		`section_id` MEDIUMINT UNSIGNED NOT NULL,
 		`class_id` MEDIUMINT UNSIGNED NOT NULL,
@@ -70,7 +33,6 @@ def create_relations(db_connector: Connection, cursor: Cursor) -> None:
 		UNIQUE(`class_id`)
 	)""")
 
-	# Table: section_students
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `section_students` (
 		`section_id` MEDIUMINT UNSIGNED NOT NULL,
 		`student_id` INT UNSIGNED NOT NULL,
@@ -81,7 +43,6 @@ def create_relations(db_connector: Connection, cursor: Cursor) -> None:
 		ON UPDATE CASCADE ON DELETE RESTRICT
 	)""")
 
-	# Table: faculty_section_course
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `faculty_section_course` (
 		`id` INT UNSIGNED AUTO_INCREMENT,
 		`faculty_id` MEDIUMINT UNSIGNED NOT NULL,
@@ -97,7 +58,6 @@ def create_relations(db_connector: Connection, cursor: Cursor) -> None:
 		UNIQUE(`faculty_id`, `section_id`, `course_code`)
 	)""")
 
-	# Table: student_electives
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `student_electives` (
 		`student_id` INT UNSIGNED NOT NULL,
 		`course_code` VARCHAR(10) NOT NULL,
@@ -108,21 +68,40 @@ def create_relations(db_connector: Connection, cursor: Cursor) -> None:
 		ON UPDATE CASCADE ON DELETE RESTRICT
 	)""")
 
-	# ✅ Sample data insertion for testing multiple faculty-course-section combinations
-	sample_data = [
-		# Case 1: One faculty teaches two courses
-		(101, 201, "CS101"),
-		(101, 201, "CS102"),
+	# Step 3: Insert sample data
 
-		# Case 2: Same course taught by multiple faculty
-		(102, 202, "CS103"),
-		(103, 203, "CS103"),
+	# Add faculties
+	i.insert_faculty(db_connector, cursor, id=101, name="Alice")
+	i.insert_faculty(db_connector, cursor, id=102, name="Bob")
+	i.insert_faculty(db_connector, cursor, id=103, name="Charlie")
+
+	# Add faculty_info
+	i.insert_faculty_info(db_connector, cursor, id=101, phone="9876543210", salary=50000, password="pass101")
+	i.insert_faculty_info(db_connector, cursor, id=102, phone="8765432109", salary=52000, password="pass102")
+	i.insert_faculty_info(db_connector, cursor, id=103, phone="7654321098", salary=51000, password="pass103")
+
+	# Add sections
+	i.insert_section(db_connector, cursor, id=201, name="S1")
+	i.insert_section(db_connector, cursor, id=202, name="S2")
+	i.insert_section(db_connector, cursor, id=203, name="S3")
+
+	# Add courses
+	i.insert_course(db_connector, cursor, code="CS101", name="Intro to CS", credits=3, is_lab=False)
+	i.insert_course(db_connector, cursor, code="CS102", name="Data Structures", credits=4, is_lab=False)
+	i.insert_course(db_connector, cursor, code="CS103", name="DBMS", credits=3, is_lab=False)
+
+	# Insert into faculty_section_course
+	sample_data = [
+		(101, 201, "CS101"),  # Alice teaches CS101 in S1
+		(101, 201, "CS102"),  # Alice teaches CS102 in S1
+		(102, 202, "CS103"),  # Bob teaches CS103 in S2
+		(103, 203, "CS103"),  # Charlie teaches CS103 in S3
 	]
 
 	for faculty_id, section_id, course_code in sample_data:
 		try:
 			cursor.execute(
-				"""INSERT IGNORE INTO faculty_section_course 
+				"""INSERT IGNORE INTO faculty_section_course
 				(faculty_id, section_id, course_code)
 				VALUES (%s, %s, %s)""",
 				(faculty_id, section_id, course_code)
