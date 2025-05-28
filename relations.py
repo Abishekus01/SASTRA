@@ -46,82 +46,88 @@ def create_relations(db_connector: Connection, cursor: Cursor) -> None:
 	import database
 	database.create_database(db_connector, cursor)
 
-	"""
-	Functional Dependencies
-	=======================
-	- `facutly_id` \u2192 `phone`, `salary`, `password`
-	"""
+	# Table: faculty_info
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `faculty_info` (
-				   `faculty_id` MEDIUMINT UNSIGNED,
-				   `phone` CHAR(10) NOT NULL,
-				   `salary` DECIMAL(12, 2) NOT NULL,
-				   `password` TINYTEXT NOT NULL,
-				   PRIMARY KEY(`faculty_id`),
-				   FOREIGN KEY(`faculty_id`) REFERENCES `faculties`(`id`)
-				   ON UPDATE CASCADE ON DELETE CASCADE,
-				   CHECK(`phone` REGEXP '^[6789][0-9]{9}$')
+		`faculty_id` MEDIUMINT UNSIGNED,
+		`phone` CHAR(10) NOT NULL,
+		`salary` DECIMAL(12, 2) NOT NULL,
+		`password` TINYTEXT NOT NULL,
+		PRIMARY KEY(`faculty_id`),
+		FOREIGN KEY(`faculty_id`) REFERENCES `faculties`(`id`)
+		ON UPDATE CASCADE ON DELETE CASCADE,
+		CHECK(`phone` REGEXP '^[6789][0-9]{9}$')
 	)""")
-	"""
-	Functional Dependencies
-	=======================
-	- `student_id` \u2192 `section_id`
-	"""
-	cursor.execute("""CREATE TABLE IF NOT EXISTS `section_class` ( -- check section class capacity
-				   `section_id` MEDIUMINT UNSIGNED NOT NULL,
-				   `class_id` MEDIUMINT UNSIGNED NOT NULL,
-				   PRIMARY KEY(`section_id`),
-				   FOREIGN KEY(`section_id`) REFERENCES `sections`(`id`)
-				   ON UPDATE CASCADE ON DELETE RESTRICT,
-				   FOREIGN KEY(`class_id`) REFERENCES `classes`(`id`)
-				   ON UPDATE CASCADE ON DELETE RESTRICT,
-				   UNIQUE(`class_id`)
+
+	# Table: section_class
+	cursor.execute("""CREATE TABLE IF NOT EXISTS `section_class` (
+		`section_id` MEDIUMINT UNSIGNED NOT NULL,
+		`class_id` MEDIUMINT UNSIGNED NOT NULL,
+		PRIMARY KEY(`section_id`),
+		FOREIGN KEY(`section_id`) REFERENCES `sections`(`id`)
+		ON UPDATE CASCADE ON DELETE RESTRICT,
+		FOREIGN KEY(`class_id`) REFERENCES `classes`(`id`)
+		ON UPDATE CASCADE ON DELETE RESTRICT,
+		UNIQUE(`class_id`)
 	)""")
-	"""
-	Functional Dependencies
-	=======================
-	- `student_id` \u2192 `section_id`
-	"""
-	cursor.execute("""CREATE TABLE IF NOT EXISTS `section_students` ( -- check section class capacity
-				   `section_id` MEDIUMINT UNSIGNED NOT NULL,
-				   `student_id` INT UNSIGNED NOT NULL,
-				   PRIMARY KEY(`student_id`),
-				   FOREIGN KEY(`section_id`) REFERENCES `sections`(`id`)
-				   ON UPDATE CASCADE ON DELETE RESTRICT,
-				   FOREIGN KEY(`student_id`) REFERENCES `students`(`id`)
-				   ON UPDATE CASCADE ON DELETE RESTRICT
+
+	# Table: section_students
+	cursor.execute("""CREATE TABLE IF NOT EXISTS `section_students` (
+		`section_id` MEDIUMINT UNSIGNED NOT NULL,
+		`student_id` INT UNSIGNED NOT NULL,
+		PRIMARY KEY(`student_id`),
+		FOREIGN KEY(`section_id`) REFERENCES `sections`(`id`)
+		ON UPDATE CASCADE ON DELETE RESTRICT,
+		FOREIGN KEY(`student_id`) REFERENCES `students`(`id`)
+		ON UPDATE CASCADE ON DELETE RESTRICT
 	)""")
-	"""
-	Functional Dependencies
-	=======================
-	- `id` \u2192 `faculty_id`, `section_id`, `course_id`
-	- `faculty_id`, `section_id`, `course_id` \u2192 `id`
-	"""
+
+	# Table: faculty_section_course
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `faculty_section_course` (
-				   `id` INT UNSIGNED AUTO_INCREMENT,
-				   `faculty_id` MEDIUMINT UNSIGNED NOT NULL,
-				   `section_id` MEDIUMINT UNSIGNED NOT NULL,
-				   `course_code` VARCHAR(10) NOT NULL,
-				   PRIMARY KEY(`id`),
-				   FOREIGN KEY(`faculty_id`) REFERENCES `faculties`(`id`)
-				   ON UPDATE CASCADE ON DELETE RESTRICT,
-				   FOREIGN KEY(`section_id`) REFERENCES `sections`(`id`)
-				   ON UPDATE CASCADE ON DELETE RESTRICT,
-				   FOREIGN KEY(`course_code`) REFERENCES `courses`(`code`)
-				   ON UPDATE CASCADE ON DELETE RESTRICT,
-				   UNIQUE(`faculty_id`, `section_id`, `course_code`)
+		`id` INT UNSIGNED AUTO_INCREMENT,
+		`faculty_id` MEDIUMINT UNSIGNED NOT NULL,
+		`section_id` MEDIUMINT UNSIGNED NOT NULL,
+		`course_code` VARCHAR(10) NOT NULL,
+		PRIMARY KEY(`id`),
+		FOREIGN KEY(`faculty_id`) REFERENCES `faculties`(`id`)
+		ON UPDATE CASCADE ON DELETE RESTRICT,
+		FOREIGN KEY(`section_id`) REFERENCES `sections`(`id`)
+		ON UPDATE CASCADE ON DELETE RESTRICT,
+		FOREIGN KEY(`course_code`) REFERENCES `courses`(`code`)
+		ON UPDATE CASCADE ON DELETE RESTRICT,
+		UNIQUE(`faculty_id`, `section_id`, `course_code`)
 	)""")
-	"""
-	Functional Dependencies
-	=======================
-	None Exist
-	"""
+
+	# Table: student_electives
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `student_electives` (
-				   `student_id` INT UNSIGNED NOT NULL, -- check student is in this section,
-				   `course_code` VARCHAR(10) NOT NULL, -- is this course elective of this student's programme?
-				   PRIMARY KEY(`student_id`, `course_code`),
-				   FOREIGN KEY(`student_id`) REFERENCES `students`(`id`)
-				   ON UPDATE CASCADE ON DELETE RESTRICT,
-				   FOREIGN KEY(`course_code`) REFERENCES `courses`(`code`)
-				   ON UPDATE CASCADE ON DELETE RESTRICT
+		`student_id` INT UNSIGNED NOT NULL,
+		`course_code` VARCHAR(10) NOT NULL,
+		PRIMARY KEY(`student_id`, `course_code`),
+		FOREIGN KEY(`student_id`) REFERENCES `students`(`id`)
+		ON UPDATE CASCADE ON DELETE RESTRICT,
+		FOREIGN KEY(`course_code`) REFERENCES `courses`(`code`)
+		ON UPDATE CASCADE ON DELETE RESTRICT
 	)""")
+
+	# ✅ Sample data insertion for testing multiple faculty-course-section combinations
+	sample_data = [
+		# Case 1: One faculty teaches two courses
+		(101, 201, "CS101"),
+		(101, 201, "CS102"),
+
+		# Case 2: Same course taught by multiple faculty
+		(102, 202, "CS103"),
+		(103, 203, "CS103"),
+	]
+
+	for faculty_id, section_id, course_code in sample_data:
+		try:
+			cursor.execute(
+				"""INSERT IGNORE INTO faculty_section_course 
+				(faculty_id, section_id, course_code)
+				VALUES (%s, %s, %s)""",
+				(faculty_id, section_id, course_code)
+			)
+		except Exception as e:
+			print(f"Error inserting ({faculty_id}, {section_id}, {course_code}):", e)
+
 	db_connector.commit()
