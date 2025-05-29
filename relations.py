@@ -49,7 +49,7 @@ def create_relations(db_connector: Connection, cursor: Cursor) -> None:
 	"""
 	Functional Dependencies
 	=======================
-	- `facutly_id` \u2192 `phone`, `salary`, `password`
+	- `facutly_id` → `phone`, `salary`, `password`
 	"""
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `faculty_info` (
 				   `faculty_id` MEDIUMINT UNSIGNED,
@@ -64,7 +64,7 @@ def create_relations(db_connector: Connection, cursor: Cursor) -> None:
 	"""
 	Functional Dependencies
 	=======================
-	- `student_id` \u2192 `section_id`
+	- `student_id` → `section_id`
 	"""
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `section_class` ( -- check section class capacity
 				   `section_id` MEDIUMINT UNSIGNED NOT NULL,
@@ -79,7 +79,7 @@ def create_relations(db_connector: Connection, cursor: Cursor) -> None:
 	"""
 	Functional Dependencies
 	=======================
-	- `student_id` \u2192 `section_id`
+	- `student_id` → `section_id`
 	"""
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `section_students` ( -- check section class capacity
 				   `section_id` MEDIUMINT UNSIGNED NOT NULL,
@@ -93,8 +93,8 @@ def create_relations(db_connector: Connection, cursor: Cursor) -> None:
 	"""
 	Functional Dependencies
 	=======================
-	- `id` \u2192 `faculty_id`, `section_id`, `course_id`
-	- `faculty_id`, `section_id`, `course_id` \u2192 `id`
+	- `id` → `faculty_id`, `section_id`, `course_id`
+	- `faculty_id`, `section_id`, `course_id` → `id`
 	"""
 	cursor.execute("""CREATE TABLE IF NOT EXISTS `faculty_section_course` (
 				   `id` INT UNSIGNED AUTO_INCREMENT,
@@ -127,3 +127,23 @@ def create_relations(db_connector: Connection, cursor: Cursor) -> None:
 	db_connector.commit()
 
 
+# a.add_faculty(db, cursor, name="Lakshmi R",        campus_id=src_id, department="CSE", join_year=2015)
+# a.add_faculty(db, cursor, name="Vijay Kumar",      campus_id=src_id, department="ECE", join_year=2012)
+# a.add_faculty(db, cursor, name="Anita Sharma",     campus_id=src_id, department="Mathematics", join_year=2018)
+# a.add_faculty(db, cursor, name="Rahul Menon", campus_id=src_id, department="Physics", join_year=2013)
+# a.add_faculty(db, cursor, name="Priya Iyer",       campus_id=src_id, department="Chemistry", join_year=2016)
+
+# Faculty info insertion
+i.insert_faculty_info(s.db_connector, s.cursor, id=1, password="password1", phone="9876543210", salary=55000.00)
+i.insert_faculty_info(s.db_connector, s.cursor, id=2, password="password2", phone="9765432109", salary=60000.00)
+i.insert_faculty_info(s.db_connector, s.cursor, id=3, password="password3", phone="9654321098", salary=52000.00)
+i.insert_faculty_info(s.db_connector, s.cursor, id=4, password="password4", phone="9543210987", salary=58000.00)
+i.insert_faculty_info(s.db_connector, s.cursor, id=5, password="password5", phone="9432109876", salary=54000.00)
+
+# One faculty teaching multiple courses (Lakshmi R → CSE101, CSE102)
+i.insert_faculty_section_course(s.db_connector, s.cursor, faculty_id=1, section_id=1, course_code="CSE101")
+i.insert_faculty_section_course(s.db_connector, s.cursor, faculty_id=1, section_id=1, course_code="CSE102")
+
+# Multiple faculty teaching same course (CSE201 taught by Vijay Kumar and Anita Sharma)
+i.insert_faculty_section_course(s.db_connector, s.cursor, faculty_id=2, section_id=2, course_code="CSE201")
+i.insert_faculty_section_course(s.db_connector, s.cursor, faculty_id=3, section_id=3, course_code="CSE201")
