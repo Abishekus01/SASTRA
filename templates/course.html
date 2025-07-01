@@ -1,63 +1,79 @@
 {% extends "layout.html" %}
 
 {% block head %}
-    <meta name="description" content="Course list for a specific Programme.">
+    <meta name="description"
+          content="Lists the all the courses and its information in a table.">
     <style>
-        :root {
-            --primary-dark: #0e1a2b;
-            --blue-shadow: 0 0 15px rgba(0, 123, 255, 0.4);
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 3rem;
-            margin-top: 2rem;
-            color: inherit;
-            text-shadow: var(--blue-shadow);
-        }
-
         table {
-            width: 90%;
+            width: 100%;
+            max-width: 1200px;
             margin: 2rem auto;
             border-collapse: collapse;
-            font-size: 1.2rem;
-            background-color: var(--primary-dark);
-            box-shadow: var(--blue-shadow);
-            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(59,130,246,0.2);
+            border-radius: 12px;
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        [data-theme="dark"] table {
+            background: #1C1033;
+            box-shadow: 0 4px 16px rgba(139,92,246,0.3);
+        }
+        table th, table td {
+            padding: 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid #D1D5DB;
+            transition: all 0.3s ease;
+        }
+        [data-theme="dark"] table th, [data-theme="dark"] table td {
+            border-bottom: 1px solid #6D28D9;
+            color: #E9D5FF;
+        }
+        table th {
+            background: linear-gradient(135deg, #3B82F6, #1e40af);
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        [data-theme="dark"] table th {
+            background: linear-gradient(135deg, #6B21A8, #9333EA);
+        }
+        table tr {
+            transition: all 0.3s ease;
+        }
+        table tr:hover {
+            background: rgba(59,130,246,0.1);
+            transform: translateY(-2px);
+        }
+        [data-theme="dark"] table tr:hover {
+            background: rgba(139,92,246,0.1);
+        }
+        table td {
+            font-size: 1rem;
+            color: #2D3748;
         }
 
-        th, td {
-            padding: 1rem;
-            text-align: center;
-            color: #e0e0e0;
+        [data-theme="dark"] table td {
+            color: #E9D5FF;
         }
-
-        th {
-            background-color: var(--menu-footer-bg-dark, #1e2b3c);
-            color: #ffffff;
-            font-size: 1.3rem;
-            border-bottom: 2px solid #007bff;
+        table tr:last-child td {
+            border-bottom: none;
         }
-
-        tr {
-            transition: background-color 0.3s;
-        }
-
-        tr:hover {
-            background-color: rgba(0, 123, 255, 0.1);
-        }
-
-        tr:nth-child(even) {
-            background-color: rgba(255, 255, 255, 0.03); /* minimal contrast */
+        @media (max-width: 600px) {
+            table th, table td {
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
         }
     </style>
 {% endblock %}
 
-{% block title %}Courses - {{ programme }}{% endblock %}
+{% block title %}{{ degree }} ({{ stream }}){% endblock %}
 
 {% block content %}
-    <h1>{{ programme }} - Courses</h1>
     {% if not courses %}
         <p style="text-align: center; font-size: 2rem; color: white;">No courses found!</p>
     {% else %}
@@ -71,14 +87,14 @@
                 <th>Credit</th>
             </tr>
             {% for course in courses %}
-            <tr>
-                <td>{{ course.course_name }}</td>
-                <td>{{ course.course_code }}</td>
-                <td>{{ course.lecture_hours }}</td>
-                <td>{{ course.tutorial_hours }}</td>
-                <td>{{ course.practical_hours }}</td>
-                <td>{{ course.credits }}</td>
-            </tr>
+                <tr>
+                    <td>{{ course.name }}</td>
+                    <td>{{ course.code }}</td>
+                    <td>{{ course.L }}</td>
+                    <td>{{ course.P }}</td>
+                    <td>{{ course.T }}</td>
+                    <td>{{ course.credits }}</td>
+                </tr>
             {% endfor %}
         </table>
     {% endif %}
