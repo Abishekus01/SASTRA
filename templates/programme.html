@@ -35,6 +35,24 @@
 			background-color: var(--accent);
 			color: white;
 		}
+
+		.timetable-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 40px;
+			font-size: 1.2rem;
+			text-align: center;
+		}
+
+		.timetable-table th, .timetable-table td {
+			border: 1px solid #ccc;
+			padding: 10px;
+		}
+
+		.timetable-table th {
+			background-color: #2b6cb0;
+			color: white;
+		}
 	</style>
 {% endblock %}
 
@@ -67,5 +85,30 @@
 				</li>
 			{% endfor %}
 		</ul>
+	{% endif %}
+
+	{% if timetable %}
+		<hr>
+		<h2 style="text-align: center; font-size: 2.5em; margin-top: 40px;">Timetable</h2>
+		<table class="timetable-table">
+			<tr>
+				<th>Day</th>
+				<th>Hour</th>
+				<th>Course Code</th>
+				<th>Room No</th>
+				<th>Building ID</th>
+				<th>Faculty ID</th>
+			</tr>
+			{% for entry in timetable %}
+			<tr>
+				<td>{{ entry.day }}</td>
+				<td>{{ entry.hour }}</td>
+				<td>{{ entry.course_code }}</td>
+				<td>{{ entry.room_no }}</td>
+				<td>{{ entry.building_id }}</td>
+				<td>{{ entry.faculty_id }}</td>
+			</tr>
+			{% endfor %}
+		</table>
 	{% endif %}
 {% endblock %}

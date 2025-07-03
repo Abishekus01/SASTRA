@@ -132,11 +132,39 @@ def show_degree_programmes(degree: str) -> str:
 		return render_template("programme.html", programmes=programmes, degree=degree)
 	return render_template("failed.html", reason="Unknown error occurred")
 
+# ✅ This handles /programme/B.Tech/CSE
 @app.route("/programme/<string:degree>/<string:stream>")
-def show_courses(degree, stream) -> str:
+def view_years(degree: str, stream: str):
+    # Always show years 1–4
+    years = [1, 2, 3, 4]
+    return render_template("year.html", degree=degree, stream=stream, years=years)
+
+
+# ✅ This handles /programme/B.Tech/CSE/1
+@app.route("/programme/<string:degree>/<string:stream>/<int:year>")
+def view_sections(degree: str, stream: str, year: int):
+	if sql.cursor:
+		try:
+			sql.cursor.execute("SELECT `section`, `campus_id` FROM `sections` WHERE `degree`=%s AND `stream`=%s AND `year`=%s", (degree, stream, year))
+			rows = sql.cursor.fetchall()
+			sections = [row["section"] for row in rows]
+			campuses = [row["campus_id"] for row in rows]
+			campus = campuses[0] if campuses else "Main"
+		except:
+			sections = []
+			campus = "Main"
+	else:
+		sections = ["A", "B", "C"]  # Dummy fallback
+		campus = "Main"
+
+	return render_template("section.html", degree=degree, stream=stream, year=year, sections=sections, campus=campus)
+
+@app.route("/programme/<string:degree>/<string:stream>/<string:year>/<string:campus>/<string:section>")
+def show_courses_with_timetable(degree, stream, year, campus, section) -> str:
 	if sql.cursor:
 		courses = fetch_data.get_courses(sql.cursor, programme_id=show_data.get_programme_id(sql.cursor, degree=degree, stream=stream))
-		return render_template("course.html", courses=courses, degree=degree, stream=stream)
+		timetable = fetch_data.get_timetable(sql.cursor, degree, stream, year, campus, section)
+		return render_template("course.html", courses=courses, timetable=timetable, degree=degree, stream=stream, year=year, campus=campus, section=section)
 	return render_template("failed.html", reason="Unknown error occurred")
 
 @app.route("/faculty/details")
@@ -158,4 +186,4 @@ if __name__ == "__main__":
 	app.config['SESSION_COOKIE_SECURE'] = True
 
 	app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPSONLY=True)
-	app.run(host="0.0.0.0", port=5000, debug=False)
+	app.run(host="0.0.0.0", port=5000, debug=True)

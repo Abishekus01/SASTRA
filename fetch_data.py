@@ -647,3 +647,20 @@ def get_student_electives(cursor: Cursor, /, *,
     else:
         cursor.execute("""SELECT * FROM `student_electives`""")
     return cursor.fetchall()
+
+def get_timetable(cursor: Cursor, /,
+                  degree: str,
+                  stream: str,
+                  year: str,
+                  campus: str,
+                  section: str) -> Optional[Tuple[Dict[str, Union[int, str]], ...]]:
+    cursor.execute("""
+        SELECT day, hour, course_code, room_no, building_id, faculty_id
+        FROM timetable_view
+        WHERE degree = %s
+          AND stream = %s
+          AND year = %s
+          AND campus = %s
+          AND section = %s
+    """, (degree, stream, year, campus, section))
+    return cursor.fetchall()
