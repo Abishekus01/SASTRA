@@ -49,7 +49,7 @@
 {% block content %}
     <p style="text-align: center; font-size: 3em">{{ degree }} - {{ stream }}</p>
     <div class="btn-container">
-        {% set roman = ['I', 'II', 'III', 'IV'] %}
+        {% set roman = ['I', 'II', 'III', 'IV', 'V', 'VI'] %}
         {% for year in years %}
             <a href="/programme/{{ degree }}/{{ stream }}/{{ year }}" class="lux-button-link">Year-{{ roman[year-1] }}</a>
         {% endfor %}

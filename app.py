@@ -135,10 +135,18 @@ def show_degree_programmes(degree: str) -> str:
 # ✅ This handles /programme/B.Tech/CSE
 @app.route("/programme/<string:degree>/<string:stream>")
 def view_years(degree: str, stream: str):
-    # Always show years 1–4
-    years = [1, 2, 3, 4]
+    durations = {
+        "B.Tech": 4,
+        "B.A": 3,
+        "B.Sc": 3,
+        "B.Com": 3,
+        "M.Tech": 2,
+        "M.A": 2,
+        "M.Sc": 2
+    }
+    duration = durations.get(degree, 4)
+    years = list(range(1, duration + 1))
     return render_template("year.html", degree=degree, stream=stream, years=years)
-
 
 # ✅ This handles /programme/B.Tech/CSE/1
 @app.route("/programme/<string:degree>/<string:stream>/<int:year>")
