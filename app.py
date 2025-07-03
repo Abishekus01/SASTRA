@@ -135,32 +135,33 @@ def show_degree_programmes(degree: str) -> str:
 # ✅ This handles /programme/B.Tech/CSE
 @app.route("/programme/<string:degree>/<string:stream>")
 def view_years(degree: str, stream: str):
-    durations = {
-        "B.Tech": 4,
-        "B.A": 3,
-        "B.Sc": 3,
-        "B.Com": 3,
-        "M.Tech": 2,
-        "M.A": 2,
-        "M.Sc": 2
-    }
-    duration = durations.get(degree, 4)
-    years = list(range(1, duration + 1))
-    return render_template("year.html", degree=degree, stream=stream, years=years)
+	durations = {
+		"B.Tech": 4,
+		"B.A": 3,
+		"B.Sc": 3,
+		"B.Com": 3,
+		"M.Tech": 2,
+		"M.A": 2,
+		"M.Sc": 2
+	}
+	duration = durations.get(degree, 4)
+	years = list(range(1, duration + 1))
+	return render_template("year.html", degree=degree, stream=stream, years=years)
 
 @app.route("/programme/<string:degree>/<string:stream>/<int:year>")
 def view_campuses(degree: str, stream: str, year: int):
-    campuses = ["SASTRA", "SRC", "Chennai Campus"]
-    return render_template("campuses.html", degree=degree, stream=stream, year=year, campuses=campuses)
+	campuses = ["SASTRA", "SRC", "Chennai Campus"]
+	courses = fetch_data.get_courses_by_degree_stream_year(sql.cursor, degree, stream, year)
+	return render_template("campuses.html", degree=degree, stream=stream, year=year, campuses=campuses, courses=courses)
 
 @app.route("/programme/<string:degree>/<string:stream>/<int:year>/<string:campus>")
 def view_sections(degree: str, stream: str, year: int, campus: str):
-    campus_ids = {"SASTRA": 1, "SRC": 2, "Chennai Campus": 3}
-    campus_id = campus_ids.get(campus)
-    sections = fetch_data.get_sections(sql.cursor, campus_id=campus_id, degree=degree, stream=stream, year=year)
-    if not sections:
-        return render_template("failed.html", reason="No sections found for the given selection.")
-    return render_template("section.html", campus=campus, degree=degree, stream=stream, year=year, sections=sections)
+	campus_ids = {"SASTRA": 1, "SRC": 2, "Chennai Campus": 3}
+	campus_id = campus_ids.get(campus)
+	sections = fetch_data.get_sections(sql.cursor, campus_id=campus_id, degree=degree, stream=stream, year=year)
+	if not sections:
+		return render_template("failed.html", reason="No sections found for the given selection.")
+	return render_template("section.html", campus=campus, degree=degree, stream=stream, year=year, sections=sections)
 
 @app.route("/programme/<string:degree>/<string:stream>/<string:year>/<string:campus>/<string:section>")
 def show_courses_with_timetable(degree, stream, year, campus, section) -> str:

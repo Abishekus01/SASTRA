@@ -1,5 +1,6 @@
 from argon2 import PasswordHasher, exceptions
 from typehints import *
+import show_data
 
 def get_courses(cursor: Cursor, /, *,
                 programme_id: Optional[int] = None,
@@ -208,6 +209,20 @@ def get_class(cursor: Cursor, /, *,
                    FROM `classes`
                    WHERE `id`=%s""", (class_id,))
     return cursor.fetchone()
+
+def get_courses_by_degree_stream_year(cursor, degree: str, stream: str, year: int) -> list[dict]:
+	programme_id = show_data.get_programme_id(cursor, degree=degree, stream=stream)
+	assert programme_id is not None, "Invalid programme"
+	query = """
+    SELECT name AS course_name, code AS course_code, L, T, P, credits AS credit
+    FROM courses
+    JOIN programme_courses ON code = course_code
+    WHERE programme_id = %s
+    """
+	cursor.execute(query, (programme_id,))
+	cols = [col[0] for col in cursor.description]
+	return [dict(zip(cols, row)) for row in cursor.fetchall()]
+
 
 def get_sections(cursor: Cursor, /, *,
                  campus_id: Optional[int] = None,
