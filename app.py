@@ -148,24 +148,19 @@ def view_years(degree: str, stream: str):
     years = list(range(1, duration + 1))
     return render_template("year.html", degree=degree, stream=stream, years=years)
 
-# ✅ This handles /programme/B.Tech/CSE/1
 @app.route("/programme/<string:degree>/<string:stream>/<int:year>")
-def view_sections(degree: str, stream: str, year: int):
-	if sql.cursor:
-		try:
-			sql.cursor.execute("SELECT `section`, `campus_id` FROM `sections` WHERE `degree`=%s AND `stream`=%s AND `year`=%s", (degree, stream, year))
-			rows = sql.cursor.fetchall()
-			sections = [row["section"] for row in rows]
-			campuses = [row["campus_id"] for row in rows]
-			campus = campuses[0] if campuses else "Main"
-		except:
-			sections = []
-			campus = "Main"
-	else:
-		sections = ["A", "B", "C"]  # Dummy fallback
-		campus = "Main"
+def view_campuses(degree: str, stream: str, year: int):
+    campuses = ["SASTRA", "SRC", "Chennai Campus"]
+    return render_template("campuses.html", degree=degree, stream=stream, year=year, campuses=campuses)
 
-	return render_template("section.html", degree=degree, stream=stream, year=year, sections=sections, campus=campus)
+@app.route("/programme/<string:degree>/<string:stream>/<int:year>/<string:campus>")
+def view_sections(degree: str, stream: str, year: int, campus: str):
+    campus_ids = {"SASTRA": 1, "SRC": 2, "Chennai Campus": 3}
+    campus_id = campus_ids.get(campus)
+    sections = fetch_data.get_sections(sql.cursor, campus_id=campus_id, degree=degree, stream=stream, year=year)
+    if not sections:
+        return render_template("failed.html", reason="No sections found for the given selection.")
+    return render_template("section.html", campus=campus, degree=degree, stream=stream, year=year, sections=sections)
 
 @app.route("/programme/<string:degree>/<string:stream>/<string:year>/<string:campus>/<string:section>")
 def show_courses_with_timetable(degree, stream, year, campus, section) -> str:
