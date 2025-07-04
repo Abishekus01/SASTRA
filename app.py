@@ -3,6 +3,7 @@ from typehints import *
 import secrets
 import show_data
 import fetch_data
+from fetch_data import get_courses_by_degree_stream_year
 import mysql_connector as sql
 
 app: Flask = Flask(__name__, template_folder="templates")
@@ -146,7 +147,11 @@ def view_years(degree: str, stream: str):
 	}
 	duration = durations.get(degree, 4)
 	years = list(range(1, duration + 1))
-	return render_template("year.html", degree=degree, stream=stream, years=years)
+	all_courses = {}
+	for y in years:
+		courses = fetch_data.get_courses_by_degree_stream_year(sql.cursor, degree, stream, y)
+		all_courses[y] = courses
+	return render_template("year.html", degree=degree, stream=stream, years=years, all_courses=all_courses)
 
 @app.route("/programme/<string:degree>/<string:stream>/<int:year>")
 def view_campuses(degree: str, stream: str, year: int):

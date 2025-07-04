@@ -42,32 +42,68 @@
             gap: 20px;
         }
 
-        .course-table {
-            width: 90%;
+        table {
+            width: 100%;
+            max-width: 1200px;
             margin: 2rem auto;
             border-collapse: collapse;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(59,130,246,0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        [data-theme="dark"] table {
+            background: #1C1033;
+            box-shadow: 0 4px 16px rgba(139,92,246,0.3);
+        }
+        table th, table td {
+            padding: 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid #D1D5DB;
+            transition: all 0.3s ease;
+        }
+        [data-theme="dark"] table th, [data-theme="dark"] table td {
+            border-bottom: 1px solid #6D28D9;
+            color: #E9D5FF;
+        }
+        table th {
+            background: linear-gradient(135deg, #3B82F6, #1e40af);
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        [data-theme="dark"] table th {
+            background: linear-gradient(135deg, #6B21A8, #9333EA);
+        }
+        table tr {
+            transition: all 0.3s ease;
+        }
+        table tr:hover {
+            background: rgba(59,130,246,0.1);
+            transform: translateY(-2px);
+        }
+        [data-theme="dark"] table tr:hover {
+            background: rgba(139,92,246,0.1);
+        }
+        table td {
             font-size: 1rem;
+            color: #2D3748;
         }
-
-        .course-table th, .course-table td {
-            border: 1px solid #ccc;
-            padding: 0.75rem;
-            text-align: center;
+        [data-theme="dark"] table td {
+            color: #E9D5FF;
         }
-
-        .course-table th {
-            background-color: var(--menu-footer-bg-dark);
-            color: white;
+        table tr:last-child td {
+            border-bottom: none;
         }
-
-        [data-theme="light"] .course-table th {
-            background-color: var(--accent);
-            color: white;
-        }
-
-        .course-table tr:nth-child(even) {
-            background-color: #f2f2f2;
+        @media (max-width: 600px) {
+            table th, table td {
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
         }
     </style>
 {% endblock %}
@@ -83,30 +119,30 @@
         {% endfor %}
     </div>
 
-    {% if courses %}
-    <table class="course-table">
-        <thead>
-            <tr>
-                <th>Course Name</th>
-                <th>Code</th>
-                <th>L</th>
-                <th>T</th>
-                <th>P</th>
-                <th>Credit</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for course in courses %}
-            <tr>
-                <td>{{ course.name }}</td>
-                <td>{{ course.code }}</td>
-                <td>{{ course.l }}</td>
-                <td>{{ course.t }}</td>
-                <td>{{ course.p }}</td>
-                <td>{{ course.credit }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
+    {% for year in years %}
+        {% set courses = all_courses[year] %}
+        {% if courses %}
+            <h2 style="text-align: center; margin-top: 3rem;">Year-{{ roman[year-1] }}</h2>
+            <table>
+                <tr>
+                    <th>Course Name</th>
+                    <th>Course Code</th>
+                    <th>L</th>
+                    <th>T</th>
+                    <th>P</th>
+                    <th>Credit</th>
+                </tr>
+                {% for course in courses %}
+                    <tr>
+                        <td>{{ course.name }}</td>
+                        <td>{{ course.code }}</td>
+                        <td>{{ course.L }}</td>
+                        <td>{{ course.T }}</td>
+                        <td>{{ course.P }}</td>
+                        <td>{{ course.credit }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endfor %}
 {% endblock %}
