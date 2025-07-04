@@ -17,6 +17,7 @@
             box-shadow: 0 4px 10px rgba(26, 145, 197, 0.5);
             transition: all 0.3s ease;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 10px;
         }
 
         .lux-button-link:hover {
@@ -33,6 +34,13 @@
             background-color: var(--accent);
             color: white;
         }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
     </style>
 {% endblock %}
 
@@ -40,12 +48,9 @@
 
 {% block content %}
     <p style="text-align: center; font-size: 3em">{{ degree }} - {{ stream }} ({{ year }}) - {{ campus }}</p>
-    <ul class="nobulletins">
+    <div class="btn-container">
         {% for section in sections %}
-            <hr>
-            <li style="text-align: center; font-size: 3em">
-                <a href="/degree/{{ degree }}/{{ stream }}/{{ year }}/{{ campus }}/{{ section }}" class="lux-button-link">Section {{ section }}</a>
-            </li>
+            <a href="/degree/{{ degree }}/{{ stream }}/{{ year }}/{{ campus }}/{{ section }}" class="lux-button-link">Section {{ section }}</a>
         {% endfor %}
-    </ul>
+    </div>
 {% endblock %}
