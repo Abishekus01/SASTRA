@@ -223,7 +223,6 @@ def get_courses_by_degree_stream_year(cursor, degree: str, stream: str, year: in
 	cols = [col[0] for col in cursor.description]
 	return [dict(zip(cols, row)) for row in cursor.fetchall()]
 
-
 def get_sections(cursor: Cursor, /, *,
                  campus_id: Optional[int] = None,
                  degree: Optional[str] = None,

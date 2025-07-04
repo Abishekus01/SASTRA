@@ -41,6 +41,34 @@
             flex-wrap: wrap;
             gap: 20px;
         }
+
+        .course-table {
+            width: 90%;
+            margin: 2rem auto;
+            border-collapse: collapse;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1rem;
+        }
+
+        .course-table th, .course-table td {
+            border: 1px solid #ccc;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .course-table th {
+            background-color: var(--menu-footer-bg-dark);
+            color: white;
+        }
+
+        [data-theme="light"] .course-table th {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .course-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
     </style>
 {% endblock %}
 
@@ -54,4 +82,31 @@
             <a href="/programme/{{ degree }}/{{ stream }}/{{ year }}" class="lux-button-link">Year-{{ roman[year-1] }}</a>
         {% endfor %}
     </div>
+
+    {% if courses %}
+    <table class="course-table">
+        <thead>
+            <tr>
+                <th>Course Name</th>
+                <th>Code</th>
+                <th>L</th>
+                <th>T</th>
+                <th>P</th>
+                <th>Credit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td>{{ course.name }}</td>
+                <td>{{ course.code }}</td>
+                <td>{{ course.l }}</td>
+                <td>{{ course.t }}</td>
+                <td>{{ course.p }}</td>
+                <td>{{ course.credit }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
 {% endblock %}
