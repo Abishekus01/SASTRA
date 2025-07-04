@@ -116,6 +116,7 @@
 		<div class="btn-container">
 			{% for programme in programmes %}
 				<a href="/programme/{{ degree }}/{{ programme.stream }}" class="lux-button-link">{{ programme["stream"] }}</a>
+				<a href="/programme/{{ degree }}/{{ programme.stream }}/all" class="year-button">View All Courses</a>
 			{% endfor %}
 		</div>
 	{% endif %}
