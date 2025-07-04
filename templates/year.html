@@ -119,11 +119,14 @@
         {% endfor %}
     </div>
 
-    {% for year in years %}
-        {% set courses = all_courses[year] %}
-        {% if courses %}
-            <h2 style="text-align: center; margin-top: 3rem;">Year-{{ roman[year-1] }}</h2>
-            <table>
+    {% set total_courses = [] %}
+    {% for y in years %}
+        {% set _ = total_courses.extend(all_courses[y]) %}
+    {% endfor %}
+
+    {% if total_courses %}
+        <table>
+            <thead>
                 <tr>
                     <th>Course Name</th>
                     <th>Course Code</th>
@@ -132,17 +135,19 @@
                     <th>P</th>
                     <th>Credit</th>
                 </tr>
-                {% for course in courses %}
+            </thead>
+            <tbody>
+                {% for course in total_courses %}
                     <tr>
                         <td>{{ course.name }}</td>
                         <td>{{ course.code }}</td>
-                        <td>{{ course.L }}</td>
-                        <td>{{ course.T }}</td>
-                        <td>{{ course.P }}</td>
+                        <td>{{ course.l }}</td>
+                        <td>{{ course.t }}</td>
+                        <td>{{ course.p }}</td>
                         <td>{{ course.credit }}</td>
                     </tr>
                 {% endfor %}
-            </table>
-        {% endif %}
-    {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}
