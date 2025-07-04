@@ -19,6 +19,7 @@
 			box-shadow: 0 4px 10px rgba(26, 145, 197, 0.5);
 			transition: all 0.3s ease;
 			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			margin: 10px;
 		}
 
 		.lux-button-link:hover {
@@ -53,6 +54,43 @@
 			background-color: #2b6cb0;
 			color: white;
 		}
+
+		.year-form {
+			display: inline-block;
+			margin: 10px;
+		}
+
+		.year-button {
+			width: 200px;
+			height: 60px;
+			font-size: 1.3rem;
+			border: none;
+			border-radius: 10px;
+			background-color: var(--menu-footer-bg-dark);
+			color: white;
+			cursor: pointer;
+			box-shadow: 0 4px 10px rgba(26, 145, 197, 0.5);
+			transition: all 0.3s ease;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			display: inline-block;
+			text-align: center;
+			line-height: 60px;
+			text-decoration: none;
+			margin: 10px;
+		}
+
+		.year-button:hover {
+			background-color: var(--accent-dark);
+			transform: translateY(-2px);
+			box-shadow: 0 6px 16px rgba(26, 145, 197, 0.65);
+		}
+
+		.btn-container {
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+			gap: 20px;
+		}
 	</style>
 {% endblock %}
 
@@ -64,11 +102,9 @@
 			{% if degree %}
 				Programmes
 				<hr>
-				<ul class="nobulletins">
-					<li style="text-align: center; font-size: 3em">
-						<a href="/programme/{{ degree }}" class="nounderline">{{ degree }}</a>
-					</li>
-				</ul>
+				<div class="btn-container">
+					<a href="/programme/{{ degree }}" class="lux-button-link">{{ degree }}</a>
+				</div>
 			{% else %}
 				<span style="font-size: 4em;">Programmes Found!!</span>
 			{% endif %}
@@ -77,14 +113,32 @@
 		<p style="margin: auto; text-align: center; font-size: 3em">Programmes
 			{% if degree %} ({{ degree }}) {% endif %}
 		</p>
-		<ul class="nobulletins">
+		<div class="btn-container">
 			{% for programme in programmes %}
-				<hr>
-				<li style="text-align: center; font-size: 3em">
-					<a href="/programme/{{ degree }}/{{ programme.stream }}" class="lux-button-link">{{ programme["stream"] }}</a>
-				</li>
+				<a href="/programme/{{ degree }}/{{ programme.stream }}" class="lux-button-link">{{ programme["stream"] }}</a>
 			{% endfor %}
-		</ul>
+		</div>
+	{% endif %}
+
+	{% if stream %}
+		<hr>
+		<p style="text-align: center; font-size: 2em;">Select Year</p>
+		<div style="text-align: center;">
+			<p style="font-size: 1.5em;">1st Year</p>
+			<a href="/programme/{{ degree }}/{{ stream }}/1/SASTRA" class="year-button">SASTRA</a>
+			<a href="/programme/{{ degree }}/{{ stream }}/1/SRC" class="year-button">SRC</a>
+			<a href="/programme/{{ degree }}/{{ stream }}/1/Chennai Campus" class="year-button">Chennai</a>
+
+			<p style="font-size: 1.5em;">2nd Year</p>
+			<a href="/programme/{{ degree }}/{{ stream }}/2/SASTRA" class="year-button">SASTRA</a>
+			<a href="/programme/{{ degree }}/{{ stream }}/2/SRC" class="year-button">SRC</a>
+			<a href="/programme/{{ degree }}/{{ stream }}/2/Chennai Campus" class="year-button">Chennai</a>
+
+			<p style="font-size: 1.5em;">3rd Year</p>
+			<a href="/programme/{{ degree }}/{{ stream }}/3/SASTRA" class="year-button">SASTRA</a>
+			<a href="/programme/{{ degree }}/{{ stream }}/3/SRC" class="year-button">SRC</a>
+			<a href="/programme/{{ degree }}/{{ stream }}/3/Chennai Campus" class="year-button">Chennai</a>
+		</div>
 	{% endif %}
 
 	{% if timetable %}

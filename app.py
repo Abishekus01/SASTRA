@@ -153,6 +153,14 @@ def view_years(degree: str, stream: str):
 		all_courses[y] = courses
 	return render_template("year.html", degree=degree, stream=stream, years=years, all_courses=all_courses)
 
+@app.route("/programme/<string:degree>/<string:stream>/all")
+def view_all_courses(degree: str, stream: str):
+	programme_id = show_data.get_programme_id(sql.cursor, degree=degree, stream=stream)
+	assert programme_id is not None, "Invalid programme"
+
+	courses = fetch_data.get_courses(sql.cursor, programme_id=programme_id)
+	return render_template("course.html", degree=degree, stream=stream, courses=courses)
+
 @app.route("/programme/<string:degree>/<string:stream>/<int:year>")
 def view_campuses(degree: str, stream: str, year: int):
 	campuses = ["SASTRA", "SRC", "Chennai Campus"]
@@ -163,7 +171,12 @@ def view_campuses(degree: str, stream: str, year: int):
 def view_sections(degree: str, stream: str, year: int, campus: str):
 	campus_ids = {"SASTRA": 1, "SRC": 2, "Chennai Campus": 3}
 	campus_id = campus_ids.get(campus)
-	sections = fetch_data.get_sections(sql.cursor, campus_id=campus_id, degree=degree, stream=stream, year=year)
+	sections = fetch_data.get_sections_from_file(
+		campus_id=campus_id,
+		degree=degree,
+		stream=stream,
+		year=year
+	)
 	if not sections:
 		return render_template("failed.html", reason="No sections found for the given selection.")
 	return render_template("section.html", campus=campus, degree=degree, stream=stream, year=year, sections=sections)

@@ -1,6 +1,7 @@
 from argon2 import PasswordHasher, exceptions
 from typehints import *
 import show_data
+import csv
 
 def get_courses(cursor: Cursor, /, *,
                 programme_id: Optional[int] = None,
@@ -222,6 +223,24 @@ def get_courses_by_degree_stream_year(cursor, degree: str, stream: str, year: in
 	cursor.execute(query, (programme_id,))
 	cols = [col[0] for col in cursor.description]
 	return [dict(zip(cols, row)) for row in cursor.fetchall()]
+
+def get_sections_from_file(*,
+                           campus_id: Optional[int] = None,
+                           degree: Optional[str] = None,
+                           stream: Optional[str] = None,
+                           year: Optional[int] = None) -> List[str]:
+    sections = []
+    with open("data/sections.csv", newline="", encoding="utf-8") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if (
+                (not campus_id or int(row["campus_id"]) == campus_id)
+                and (not degree or row["degree"] == degree)
+                and (not stream or row["stream"] == stream)
+                and (not year or int(row["year"]) == year)
+            ):
+                sections.append(row["section"])
+    return sections
 
 def get_sections(cursor: Cursor, /, *,
                  campus_id: Optional[int] = None,
