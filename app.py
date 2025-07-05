@@ -198,6 +198,10 @@ def faculty_details() -> str:
 		return render_template("faculty.html", faculty=faculty, campus=show_data.get_campus_name(sql.cursor, id=faculty["campus_id"]))
 	return render_template("failed.html", reason="Unknown error occurred")
 
+@app.route("/health")
+def health():
+    return "OK", 200
+
 @app.errorhandler(404)
 def page_not_found(error: NotFound) -> tuple[str, int]:
 	return (render_template("404.html"), 404)
