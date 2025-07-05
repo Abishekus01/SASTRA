@@ -1,38 +1,31 @@
 {% extends "layout.html" %}
 
 {% block head %}
-    <meta name="description" content="Displays the academic years for the selected degree and stream.">
+    <meta name="description" content="Shows years for selected degree and stream.">
     <style>
-        .lux-button-link {
-            display: inline-block;
-            width: 322px;
-            height: 122px;
-            line-height: 122px;
-            text-align: center;
-            font-size: 1.5rem;
-            text-decoration: none;
+        .year-button {
+            width: 200px;
+            height: 60px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 10px;
             background-color: var(--menu-footer-bg-dark);
             color: white;
-            border-radius: 12px;
+            cursor: pointer;
             box-shadow: 0 4px 10px rgba(26, 145, 197, 0.5);
             transition: all 0.3s ease;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: inline-block;
+            text-align: center;
+            line-height: 60px;
+            text-decoration: none;
             margin: 10px;
         }
 
-        .lux-button-link:hover {
+        .year-button:hover {
             background-color: var(--accent-dark);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(26, 145, 197, 0.65);
-        }
-
-        .lux-button-link:active {
-            transform: scale(0.98);
-        }
-
-        [data-theme="light"] .lux-button-link {
-            background-color: var(--accent);
-            color: white;
         }
 
         .btn-container {
@@ -40,114 +33,19 @@
             justify-content: center;
             flex-wrap: wrap;
             gap: 20px;
-        }
-
-        table {
-            width: 100%;
-            max-width: 1200px;
-            margin: 2rem auto;
-            border-collapse: collapse;
-            font-family: 'Inter', sans-serif;
-            background: #fff;
-            box-shadow: 0 4px 16px rgba(59,130,246,0.2);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        [data-theme="dark"] table {
-            background: #1C1033;
-            box-shadow: 0 4px 16px rgba(139,92,246,0.3);
-        }
-        table th, table td {
-            padding: 1.2rem;
-            text-align: left;
-            border-bottom: 1px solid #D1D5DB;
-            transition: all 0.3s ease;
-        }
-        [data-theme="dark"] table th, [data-theme="dark"] table td {
-            border-bottom: 1px solid #6D28D9;
-            color: #E9D5FF;
-        }
-        table th {
-            background: linear-gradient(135deg, #3B82F6, #1e40af);
-            color: white;
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        [data-theme="dark"] table th {
-            background: linear-gradient(135deg, #6B21A8, #9333EA);
-        }
-        table tr {
-            transition: all 0.3s ease;
-        }
-        table tr:hover {
-            background: rgba(59,130,246,0.1);
-            transform: translateY(-2px);
-        }
-        [data-theme="dark"] table tr:hover {
-            background: rgba(139,92,246,0.1);
-        }
-        table td {
-            font-size: 1rem;
-            color: #2D3748;
-        }
-        [data-theme="dark"] table td {
-            color: #E9D5FF;
-        }
-        table tr:last-child td {
-            border-bottom: none;
-        }
-        @media (max-width: 600px) {
-            table th, table td {
-                padding: 0.8rem;
-                font-size: 0.9rem;
-            }
+            margin-top: 2rem;
         }
     </style>
 {% endblock %}
 
-{% block title %}{{ degree }} - {{ stream }} Years{% endblock %}
+{% block title %}{{ degree }} - {{ stream }}{% endblock %}
 
 {% block content %}
-    <p style="text-align: center; font-size: 3em">{{ degree }} - {{ stream }}</p>
+    <h1 style="text-align: center; font-size: 2.5em;">{{ degree }} - {{ stream }}</h1>
+
     <div class="btn-container">
-        {% set roman = ['I', 'II', 'III', 'IV', 'V', 'VI'] %}
-        {% for year in years %}
-            <a href="/programme/{{ degree }}/{{ stream }}/{{ year }}" class="lux-button-link">Year-{{ roman[year-1] }}</a>
+        {% for y in years %}
+            <a href="/programme/{{ degree }}/{{ stream }}/{{ y }}" class="year-button">Year-{{ y }}</a>
         {% endfor %}
     </div>
-
-    {% set total_courses = [] %}
-    {% for y in years %}
-        {% set _ = total_courses.extend(all_courses[y]) %}
-    {% endfor %}
-
-    {% if total_courses %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Course Name</th>
-                    <th>Course Code</th>
-                    <th>L</th>
-                    <th>T</th>
-                    <th>P</th>
-                    <th>Credit</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for course in total_courses %}
-                    <tr>
-                        <td>{{ course.name }}</td>
-                        <td>{{ course.code }}</td>
-                        <td>{{ course.l }}</td>
-                        <td>{{ course.t }}</td>
-                        <td>{{ course.p }}</td>
-                        <td>{{ course.credit }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
 {% endblock %}
