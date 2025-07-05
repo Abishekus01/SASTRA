@@ -133,7 +133,6 @@ def show_degree_programmes(degree: str) -> str:
 		return render_template("programme.html", programmes=programmes, degree=degree)
 	return render_template("failed.html", reason="Unknown error occurred")
 
-# ✅ This handles /programme/B.Tech/CSE
 @app.route("/programme/<string:degree>/<string:stream>")
 def view_years(degree: str, stream: str):
 	durations = {
