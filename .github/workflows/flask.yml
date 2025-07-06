@@ -12,6 +12,8 @@ permissions:
 jobs:
   check-flask-site:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
     - name: Checkout Code
@@ -24,13 +26,14 @@ jobs:
 
     - name: Install dependencies
       run: |
+        python -m pip install --upgrade pip
         pip install -r requirements.txt
 
     - name: Run Flask App
       run: |
-        nohup python app.py > flask.log 2>&1 &
-        sleep 10
+        python app.py &
+        sleep 5
 
     - name: Health Check on /health
       run: |
-        curl --fail http://127.0.0.1:5000/health || (echo "Health check failed" && cat flask.log && exit 1)
+        curl --fail http://localhost:5000/health || exit 1
