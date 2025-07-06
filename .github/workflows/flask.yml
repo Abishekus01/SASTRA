@@ -1,0 +1,39 @@
+name: Flask Health Check
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  check-flask-site:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Flask App
+      run: |
+        nohup python app.py > flask.log 2>&1 &
+        sleep 10
+
+    - name: Health Check on /health
+      run: |
+        curl --fail http://127.0.0.1:5000/health || (echo "Health check failed" && cat flask.log && exit 1)
